@@ -1,0 +1,40 @@
+services:
+  jetstream:
+    build: ./services/jetstream
+    env_file: .env
+    restart: unless-stopped
+    depends_on:
+      - migrate
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  graphql:
+    build: ./services/graphql
+    env_file: .env
+    ports:
+      - "${GRAPHQL_PORT:-4000}:4000"
+    restart: unless-stopped
+    depends_on:
+      - migrate
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  migrate:
+    build: ./services/jetstream
+    env_file: .env
+    command: ["node", "dist/migrate.js"]
+    restart: "no"
+
+  backfill:
+    build: ./services/jetstream
+    env_file: .env
+    command: ["node", "dist/backfill.js"]
+    restart: "no"
+    profiles:
+      - tools
