@@ -3,9 +3,8 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY tsconfig.json ./
-COPY ../../tsconfig.base.json ./tsconfig.base.json
 COPY src ./src
-RUN npm run build
+RUN npx tsc
 
 FROM node:20-alpine
 WORKDIR /app

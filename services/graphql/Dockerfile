@@ -1,18 +1,17 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package.json package-lock.json* ./
+COPY services/graphql/package.json services/graphql/package-lock.json* ./
 RUN npm install
-COPY tsconfig.json ./
-COPY ../../tsconfig.base.json ./tsconfig.base.json
-COPY src ./src
-COPY ../../lexicons ./lexicons
-RUN npm run build
+COPY services/graphql/tsconfig.json ./
+COPY services/graphql/src ./src
+COPY lexicons ./lexicons
+RUN npx tsc
 
 FROM node:20-alpine
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/lexicons ./lexicons
-COPY package.json ./
+COPY services/graphql/package.json ./
 EXPOSE 4000
 CMD ["node", "dist/index.js"]
