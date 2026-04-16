@@ -1,0 +1,6 @@
+{
+  "installCommand": "git submodule update --init --recursive && npm install",
+  "rewrites": [
+    { "source": "/graphql", "destination": "/api/graphql" }
+  ]
+}

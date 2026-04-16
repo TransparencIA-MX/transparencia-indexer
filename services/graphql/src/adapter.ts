@@ -13,13 +13,13 @@ import type { GraphQLSchema } from "graphql";
 const { Pool } = pg;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-function loadLexicons() {
-  const lexiconDir = join(__dirname, "..", "lexicons", "lexicons", "tech", "transparencia");
+function loadLexicons(lexiconDir?: string) {
+  const dir = lexiconDir ?? join(__dirname, "..", "lexicons", "lexicons", "tech", "transparencia");
   const files = [
-    join(lexiconDir, "defs.json"),
-    join(lexiconDir, "news", "article.json"),
-    join(lexiconDir, "news", "source.json"),
-    join(lexiconDir, "news", "enrichment.json"),
+    join(dir, "defs.json"),
+    join(dir, "news", "article.json"),
+    join(dir, "news", "source.json"),
+    join(dir, "news", "enrichment.json"),
   ];
 
   return files.map((f) => {
@@ -136,7 +136,7 @@ function transformRow(row: any): any {
   };
 }
 
-export async function createAdapter(): Promise<{ schema: GraphQLSchema; execute: (query: string, variables?: any) => Promise<any> }> {
+export async function createAdapter(options?: { lexiconDir?: string }): Promise<{ schema: GraphQLSchema; execute: (query: string, variables?: any) => Promise<any> }> {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     max: 10,
@@ -148,7 +148,7 @@ export async function createAdapter(): Promise<{ schema: GraphQLSchema; execute:
   console.log(`Database connected. Records: ${res.rows[0].count}`);
 
   // Load and parse lexicons
-  const lexicons = loadLexicons();
+  const lexicons = loadLexicons(options?.lexiconDir);
   console.log(`Loaded ${lexicons.length} lexicons`);
 
   // Create lex-gql adapter
