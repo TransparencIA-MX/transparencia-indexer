@@ -8,7 +8,7 @@ import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { createAdapter } from "../services/graphql/src/adapter.js";
 
-const API_KEY = process.env.GRAPHQL_API_KEY;
+const API_KEY = process.env.GRAPHQL_API_KEY?.trim();
 
 // Lexicons are at the repo root — process.cwd() is the project root on Vercel
 const lexiconDir = join(process.cwd(), "lexicons", "lexicons", "tech", "transparencia");
