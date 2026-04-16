@@ -8,6 +8,10 @@ services:
     volumes:
       - tap-data:/data
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128m
     logging:
       driver: json-file
       options:
@@ -21,6 +25,10 @@ services:
     depends_on:
       - tap
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256m
     logging:
       driver: json-file
       options:
@@ -36,11 +44,45 @@ services:
     ports:
       - "${GRAPHQL_PORT:-4000}:4000"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256m
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
+
+  # Observability: Netdata — métricas en tiempo real del Pi + contenedores Docker
+  netdata:
+    image: netdata/netdata:stable
+    container_name: netdata
+    hostname: transparencia-pi
+    ports:
+      - "19999:19999"
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+    volumes:
+      - netdata-config:/etc/netdata
+      - netdata-lib:/var/lib/netdata
+      - netdata-cache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      resources:
+        limits:
+          memory: 150m
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
 
   # One-shot: run database migration
   migrate:
@@ -75,3 +117,6 @@ services:
 
 volumes:
   tap-data:
+  netdata-config:
+  netdata-lib:
+  netdata-cache:
