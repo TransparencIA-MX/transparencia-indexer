@@ -79,6 +79,12 @@ Node.js service that consumes Tap events via WebSocket and upserts records into 
 ### GraphQL API
 Auto-generated GraphQL endpoint from AT Protocol lexicons via [lex-gql](https://tangled.org/chadtmiller.com/lex-gql). Supports filtering, sorting, pagination, joins via strongRef, and full-text search.
 
+#### Why a custom adapter
+
+[lex-gql](https://tangled.org/chadtmiller.com/lex-gql) is the cool part: it turns lexicon JSON into a full GraphQL schema — types, connections, filters, forward/reverse joins, N+1 batching — all for free. It's backend-agnostic by design, so it doesn't ship a database.
+
+That's the gap `services/graphql/src/adapter.ts` fills. It's the thin glue that implements lex-gql's `query` port against our Postgres schema (`atproto.records` + JSONB): translating `where/sort/pagination` into SQL, joining `actors` for handles, and exposing the same adapter to both the Docker service and the Vercel Function. Short version: **lex-gql generates the API, the adapter runs it against Supabase.**
+
 ## Configuration
 
 | Variable | Required | Description |
