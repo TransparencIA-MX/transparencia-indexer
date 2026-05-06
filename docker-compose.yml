@@ -3,6 +3,10 @@ services:
   tap:
     image: ghcr.io/bluesky-social/indigo/tap:latest
     env_file: .env
+    # Workaround mientras propaga el DNS de pds.transparencia.tech al PDS nuevo.
+    # Quitar cuando dig resuelva el IP nuevo en todos los resolvers.
+    extra_hosts:
+      - "pds.transparencia.tech:104.198.49.18"
     ports:
       - "${TAP_PORT:-2480}:2480"
     volumes:
